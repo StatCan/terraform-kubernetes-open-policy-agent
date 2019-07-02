@@ -14,7 +14,7 @@ resource "null_resource" "dependency_getter" {
 resource "null_resource" "gatekeeper_init" {
 
   provisioner "local-exec" {
-    command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/templates/gatekeeper.yml"}"
+    command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/config/gatekeeper.yml"}"
   }
 
   depends_on = [
