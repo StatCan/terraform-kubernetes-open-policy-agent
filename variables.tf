@@ -9,3 +9,8 @@ variable "enable_azure_policy" {
   type = string
   default = "0"
 }
+
+variable "values" {
+  default = ""
+  type = "string"
+}
