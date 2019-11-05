@@ -36,6 +36,7 @@ module "kubectl_opa" {
 | dependencies            | list   | yes      | Dependency name refering to namespace module           |
 | kubectl_service_account | list   | yes      | The service account for kubectl to use                 |
 | kubectl_namespace       | list   | yes      | The namespace kubectl will install the manifests under |
+| enable_azure_policy     | string | yes      | Whether to install the Azure Policy helm chart         |
 
 ## History
 

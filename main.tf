@@ -22,6 +22,47 @@ resource "null_resource" "gatekeeper_init" {
   ]
 }
 
+resource "null_resource" "azure_policy_gatekeeper_sync" {
+  count = "${var.enable_azure_policy ? 1 : 0}"
+
+  provisioner "local-exec" {
+    command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/config/azure/gatekeeper-opa-sync.yml"}"
+  }
+
+  depends_on = [
+    "null_resource.dependency_getter",
+  ]
+}
+
+resource "null_resource" "wait-dependencies" {
+    count = "${var.enable_azure_policy ? 1 : 0}"
+
+  provisioner "local-exec" {
+    command = "helm ls --tiller-namespace ${var.helm_namespace}"
+  }
+
+  depends_on = [
+    "null_resource.dependency_getter",
+  ]
+}
+
+resource "helm_release" "azure_policy" {
+  count = "${var.enable_azure_policy ? 1 : 0}"
+
+  depends_on = ["null_resource.wait-dependencies", "null_resource.dependency_getter"]
+  name = "azure-policy"
+  repository = "${var.helm_repository}"
+  chart = "azure-policy"
+  version = "${var.chart_version}"
+  namespace = "${var.helm_namespace}"
+  timeout = 1200
+
+  values = [
+    "${var.values}",
+  ]
+
+}
+
 # Part of a hack for module-to-module dependencies.
 # https://github.com/hashicorp/terraform/issues/1178#issuecomment-449158607
 resource "null_resource" "dependency_setter" {
@@ -30,5 +71,7 @@ resource "null_resource" "dependency_setter" {
   # List resource(s) that will be constructed last within the module.
   depends_on = [
     "null_resource.gatekeeper_init",
+    "null_resource.azure_policy_gatekeeper_sync",
+    "helm_release.azure_policy"
   ]
 }
