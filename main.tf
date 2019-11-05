@@ -52,7 +52,7 @@ resource "helm_release" "azure_policy" {
   depends_on = ["null_resource.wait-dependencies", "null_resource.dependency_getter"]
   name = "azure-policy"
   repository = "${var.helm_repository}"
-  chart = "azure-policy"
+  chart = "azure-policy-addon-aks-engine"
   version = "${var.chart_version}"
   namespace = "${var.helm_namespace}"
   timeout = 1200
