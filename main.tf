@@ -9,6 +9,12 @@ resource "null_resource" "dependency_getter" {
   triggers = {
     my_dependencies = "${join(",", var.dependencies)}"
   }
+
+  lifecycle {
+    ignore_changes = [
+      triggers["my_dependencies"],
+    ]
+  }
 }
 
 resource "null_resource" "gatekeeper_init" {
@@ -35,7 +41,7 @@ resource "null_resource" "azure_policy_gatekeeper_sync" {
 }
 
 resource "null_resource" "wait-dependencies" {
-    count = "${var.enable_azure_policy ? 1 : 0}"
+  count = "${var.enable_azure_policy ? 1 : 0}"
 
   provisioner "local-exec" {
     command = "helm ls --tiller-namespace ${var.helm_namespace}"
@@ -50,12 +56,12 @@ resource "helm_release" "azure_policy" {
   count = "${var.enable_azure_policy ? 1 : 0}"
 
   depends_on = ["null_resource.wait-dependencies", "null_resource.dependency_getter"]
-  name = "azure-policy"
+  name       = "azure-policy"
   repository = "${var.helm_repository}"
-  chart = "azure-policy-addon-aks-engine"
-  version = "${var.chart_version}"
-  namespace = "${var.helm_namespace}"
-  timeout = 1200
+  chart      = "azure-policy-addon-aks-engine"
+  version    = "${var.chart_version}"
+  namespace  = "${var.helm_namespace}"
+  timeout    = 1200
 
   values = [
     "${var.values}",

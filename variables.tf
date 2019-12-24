@@ -14,11 +14,11 @@ variable "dependencies" {
 }
 
 variable "enable_azure_policy" {
-  type = string
+  type    = string
   default = "0"
 }
 
 variable "values" {
   default = ""
-  type = "string"
+  type    = "string"
 }
