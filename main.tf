@@ -18,6 +18,9 @@ resource "null_resource" "dependency_getter" {
 }
 
 resource "null_resource" "gatekeeper_init" {
+  triggers = {
+    hash = filesha256("${path.module}/config/gatekeeper.yml")
+  }
 
   provisioner "local-exec" {
     command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/config/gatekeeper.yml"}"
@@ -30,6 +33,10 @@ resource "null_resource" "gatekeeper_init" {
 
 resource "null_resource" "azure_policy_gatekeeper_sync" {
   count = "${var.enable_azure_policy ? 1 : 0}"
+
+  triggers = {
+    hash = filesha256("${path.module}/config/azure/gatekeeper-opa-sync.yml")
+  }
 
   provisioner "local-exec" {
     command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/config/azure/gatekeeper-opa-sync.yml"}"
