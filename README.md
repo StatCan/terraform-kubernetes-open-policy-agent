@@ -22,29 +22,43 @@ The following security controls can be met through configuration of this templat
 
 ```terraform
 module "kubectl_opa" {
-  source = "github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent?ref=20190909.1"
+  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v2.0.0"
 
   dependencies = [
     "${module.namespace_gatekeeper_system.depended_on}",
   ]
 
   kubectl_service_account = "${module.namespace_gatekeeper_system.helm_service_account}"
-  kubectl_namespace = "${module.namespace_gatekeeper_system.name}"
+  kubectl_namespace       = "${module.namespace_gatekeeper_system.name}"
+
+  chart_version = "0.1.0"
+
+  helm_namespace       = "${module.namespace_gatekeeper_system.name}"
+  helm_repository      = "azure-policy"
+
+  enable_azure_policy = 0
+  values              = <<EOF
+
+EOF
 }
 ```
 
 ## Variables Values
 
-| Name                    | Type   | Required | Value                                                  |
-| ----------------------- | ------ | -------- | ------------------------------------------------------ |
-| dependencies            | list   | yes      | Dependency name refering to namespace module           |
-| kubectl_service_account | list   | yes      | The service account for kubectl to use                 |
-| kubectl_namespace       | list   | yes      | The namespace kubectl will install the manifests under |
-| enable_azure_policy     | string | yes      | Whether to install the Azure Policy helm chart         |
+| Name                | Type   | Required | Value                                                  |
+| ------------------- | ------ | -------- | ------------------------------------------------------ |
+| dependencies        | list   | yes      | Dependency name refering to namespace module           |
+| kubectl_namespace   | list   | yes      | The namespace kubectl will install the manifests under |
+| enable_azure_policy | string | yes      | Whether to install the Azure Policy helm chart         |
+| helm_repository     | string | yes      | The repository from which to download the chart        |
+| helm_namespace      | string | yes      | The namespace in which to install the chart            |
+| chart_version       | string | yes      | The version of the Azure Policy helm chart             |
+| values              | string | no       | The values to pass to the Azure Policy chart           |
 
 ## History
 
-| Date     | Release    | Change                                                     |
-| -------- | ---------- | ---------------------------------------------------------- |
-| 20190729 | 20190729.1 | Improvements to documentation and formatting               |
-| 20190909 | 20190909.1 | 1st release                                                |
+| Date     | Release    | Change                                       |
+| -------- | ---------- | -------------------------------------------- |
+| 20190729 | 20190729.1 | Improvements to documentation and formatting |
+| 20190909 | 20190909.1 | 1st release                                  |
+| 20200623 | v2.0.0     | Minor modifications to submodule for Helm 3  |
