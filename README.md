@@ -32,6 +32,7 @@ module "kubectl_opa" {
 
   chart_version = "0.1.0"
 
+  helm_namespace       = "${module.namespace_gatekeeper_system.name}"
   helm_repository      = "azure-policy"
 
   enable_azure_policy = 0
