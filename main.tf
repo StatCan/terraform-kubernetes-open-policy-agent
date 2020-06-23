@@ -47,22 +47,10 @@ resource "null_resource" "azure_policy_gatekeeper_sync" {
   ]
 }
 
-resource "null_resource" "wait-dependencies" {
-  count = "${var.enable_azure_policy ? 1 : 0}"
-
-  provisioner "local-exec" {
-    command = "helm ls --tiller-namespace ${var.helm_namespace}"
-  }
-
-  depends_on = [
-    "null_resource.dependency_getter",
-  ]
-}
-
 resource "helm_release" "azure_policy" {
   count = "${var.enable_azure_policy ? 1 : 0}"
 
-  depends_on = ["null_resource.wait-dependencies", "null_resource.dependency_getter"]
+  depends_on = ["null_resource.dependency_getter"]
   name       = "azure-policy"
   repository = "${var.helm_repository}"
   chart      = "azure-policy-addon-aks-engine"
