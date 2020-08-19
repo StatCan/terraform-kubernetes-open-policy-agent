@@ -18,14 +18,14 @@ resource "null_resource" "dependency_getter" {
 }
 
 resource "local_file" "gatekeeper_template" {
-  content = "${templatefile("${path.module}/config/gatekeeper.yaml", {
+  content = "${templatefile("${path.module}/config/gatekeeper.yml", {
     opa_limits_cpu            = "${var.opa_limits_cpu}"
     opa_limits_memory            = "${var.opa_limits_memory}"
     opa_requests_cpu            = "${var.opa_requests_cpu}"
     opa_requests_memory            = "${var.opa_requests_memory}"
   })}"
 
-  filename = "${path.module}/gatekeeper.yaml"
+  filename = "${path.module}/gatekeeper.yml"
 }
 
 resource "null_resource" "gatekeeper_init" {
