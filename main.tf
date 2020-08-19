@@ -17,13 +17,24 @@ resource "null_resource" "dependency_getter" {
   }
 }
 
+resource "local_file" "gatekeeper_template" {
+  content = "${templatefile("${path.module}/config/gatekeeper.yaml", {
+    opa_limits_cpu            = "${var.opa_limits_cpu}"
+    opa_limits_memory            = "${var.opa_limits_memory}"
+    opa_requests_cpu            = "${var.opa_requests_cpu}"
+    opa_requests_memory            = "${var.opa_requests_memory}"
+  })}"
+
+  filename = "${path.module}/gatekeeper.yaml"
+}
+
 resource "null_resource" "gatekeeper_init" {
   triggers = {
-    hash = filesha256("${path.module}/config/gatekeeper.yml")
+    hash = sha256(local_file.gatekeeper_template.content)
   }
 
   provisioner "local-exec" {
-    command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/config/gatekeeper.yml"}"
+    command = "kubectl -n ${var.kubectl_namespace} apply -f ${local_file.gatekeeper_template.filename}"
   }
 
   depends_on = [
