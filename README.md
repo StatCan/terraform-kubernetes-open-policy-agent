@@ -22,7 +22,7 @@ The following security controls can be met through configuration of this templat
 
 ```terraform
 module "kubectl_opa" {
-  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v2.0.0"
+  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v2.0.1"
 
   dependencies = [
     "${module.namespace_gatekeeper_system.depended_on}",
@@ -61,3 +61,4 @@ EOF
 | 20190729 | 20190729.1 | Improvements to documentation and formatting |
 | 20190909 | 20190909.1 | 1st release                                  |
 | 20200623 | v2.0.0     | Minor modifications to submodule for Helm 3  |
+| 20200824 | v2.0.1     | Upgrade OPA to v3.1.0-rc1                    |
