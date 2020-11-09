@@ -7,7 +7,7 @@
 # module:
 resource "null_resource" "dependency_getter" {
   triggers = {
-    my_dependencies = "${join(",", var.dependencies)}"
+    my_dependencies = join(",", var.dependencies)
   }
 
   lifecycle {
@@ -18,19 +18,19 @@ resource "null_resource" "dependency_getter" {
 }
 
 resource "local_file" "gatekeeper_template" {
-  content = "${templatefile("${path.module}/config/gatekeeper.yml", {
-    opa_limits_cpu            = "${var.opa_limits_cpu}"
-    opa_limits_memory            = "${var.opa_limits_memory}"
-    opa_requests_cpu            = "${var.opa_requests_cpu}"
-    opa_requests_memory            = "${var.opa_requests_memory}"
-  })}"
+  sensitive_content = templatefile("${path.module}/config/gatekeeper.yml", {
+    opa_limits_cpu      = var.opa_limits_cpu
+    opa_limits_memory   = var.opa_limits_memory
+    opa_requests_cpu    = var.opa_requests_cpu
+    opa_requests_memory = var.opa_requests_memory
+  })
 
   filename = "${path.module}/gatekeeper.yml"
 }
 
 resource "null_resource" "gatekeeper_init" {
   triggers = {
-    hash = sha256(local_file.gatekeeper_template.content)
+    manifests = local_file.gatekeeper_template.sensitive_content
   }
 
   provisioner "local-exec" {
@@ -38,39 +38,39 @@ resource "null_resource" "gatekeeper_init" {
   }
 
   depends_on = [
-    "null_resource.dependency_getter",
+    null_resource.dependency_getter,
   ]
 }
 
 resource "null_resource" "azure_policy_gatekeeper_sync" {
-  count = "${var.enable_azure_policy ? 1 : 0}"
+  count = var.enable_azure_policy ? 1 : 0
 
   triggers = {
     hash = filesha256("${path.module}/config/azure/gatekeeper-opa-sync.yml")
   }
 
   provisioner "local-exec" {
-    command = "kubectl -n ${var.kubectl_namespace} apply -f ${"${path.module}/config/azure/gatekeeper-opa-sync.yml"}"
+    command = "kubectl -n ${var.kubectl_namespace} apply -f ${path.module}/config/azure/gatekeeper-opa-sync.yml"
   }
 
   depends_on = [
-    "null_resource.dependency_getter",
+    null_resource.dependency_getter,
   ]
 }
 
 resource "helm_release" "azure_policy" {
-  count = "${var.enable_azure_policy ? 1 : 0}"
+  count = var.enable_azure_policy ? 1 : 0
 
   depends_on = ["null_resource.dependency_getter"]
   name       = "azure-policy"
-  repository = "${var.helm_repository}"
+  repository = var.helm_repository
   chart      = "azure-policy-addon-aks-engine"
-  version    = "${var.chart_version}"
-  namespace  = "${var.helm_namespace}"
+  version    = var.chart_version
+  namespace  = var.helm_namespace
   timeout    = 1200
 
   values = [
-    "${var.values}",
+    var.values,
   ]
 
 }
@@ -82,8 +82,8 @@ resource "null_resource" "dependency_setter" {
   # https://github.com/hashicorp/terraform/issues/1178#issuecomment-449158607
   # List resource(s) that will be constructed last within the module.
   depends_on = [
-    "null_resource.gatekeeper_init",
-    "null_resource.azure_policy_gatekeeper_sync",
-    "helm_release.azure_policy"
+    null_resource.gatekeeper_init,
+    null_resource.azure_policy_gatekeeper_sync,
+    helm_release.azure_policy
   ]
 }
