@@ -39,3 +39,23 @@ variable "opa_requests_memory" {
   default = "256Mi"
   type    = "string"
 }
+
+variable "opa_audit_limits_cpu" {
+  default = "1000m"
+  type    = "string"
+}
+
+variable "opa_audit_limits_memory" {
+  default = "512Mi"
+  type    = "string"
+}
+
+variable "opa_audit_requests_cpu" {
+  default = "100m"
+  type    = "string"
+}
+
+variable "opa_audit_requests_memory" {
+  default = "256Mi"
+  type    = "string"
+}

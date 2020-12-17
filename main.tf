@@ -23,6 +23,11 @@ resource "local_file" "gatekeeper_template" {
     opa_limits_memory   = var.opa_limits_memory
     opa_requests_cpu    = var.opa_requests_cpu
     opa_requests_memory = var.opa_requests_memory
+
+    opa_audit_limits_cpu      = var.opa_audit_limits_cpu
+    opa_audit_limits_memory   = var.opa_audit_limits_memory
+    opa_audit_requests_cpu    = var.opa_audit_requests_cpu
+    opa_audit_requests_memory = var.opa_audit_requests_memory
   })
 
   filename = "${path.module}/gatekeeper.yml"
