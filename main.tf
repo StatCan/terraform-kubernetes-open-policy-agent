@@ -24,6 +24,9 @@ resource "local_file" "gatekeeper_template" {
     opa_requests_cpu    = var.opa_requests_cpu
     opa_requests_memory = var.opa_requests_memory
 
+    image_hub          = var.image_hub
+    image_pull_secrets = var.image_pull_secrets
+
     opa_audit_limits_cpu      = var.opa_audit_limits_cpu
     opa_audit_limits_memory   = var.opa_audit_limits_memory
     opa_audit_requests_cpu    = var.opa_audit_requests_cpu

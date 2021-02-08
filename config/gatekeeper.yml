@@ -409,6 +409,44 @@ metadata:
     gatekeeper.sh/system: "yes"
   name: gatekeeper-admin
   namespace: gatekeeper-system
+%{ if image_pull_secrets != [] ~}
+imagePullSecrets:
+%{ for secret in image_pull_secrets ~}
+- name: ${ secret }
+%{ endfor ~}
+%{ endif ~}
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+  labels:
+    gatekeeper.sh/system: "yes"
+  name: gatekeeper-admin
+spec:
+  allowPrivilegeEscalation: false
+  fsGroup:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  requiredDropCapabilities:
+  - ALL
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  volumes:
+  - configMap
+  - projected
+  - secret
+  - downwardAPI
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
@@ -521,6 +559,18 @@ rules:
   - update
 - apiGroups:
   - constraints.gatekeeper.sh
+  resources:
+  - '*'
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mutations.gatekeeper.sh
   resources:
   - '*'
   verbs:
@@ -654,7 +704,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    control-plane: controller-manager
+    control-plane: audit-controller
     gatekeeper.sh/operation: audit
     gatekeeper.sh/system: "yes"
   name: gatekeeper-audit
@@ -675,6 +725,7 @@ spec:
         gatekeeper.sh/operation: audit
         gatekeeper.sh/system: "yes"
     spec:
+      automountServiceAccountToken: true
       containers:
       - args:
         - --operation=audit
@@ -692,7 +743,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: openpolicyagent/gatekeeper:v3.2.0
+        image: ${ image_hub }/gatekeeper:v3.3.0
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -722,6 +773,7 @@ spec:
           capabilities:
             drop:
             - all
+          readOnlyRootFilesystem: true
           runAsGroup: 999
           runAsNonRoot: true
           runAsUser: 1000
@@ -767,6 +819,7 @@ spec:
                   - webhook
               topologyKey: kubernetes.io/hostname
             weight: 100
+      automountServiceAccountToken: true
       containers:
       - args:
         - --port=8443
@@ -785,7 +838,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: openpolicyagent/gatekeeper:v3.2.0
+        image: ${ image_hub }/gatekeeper:v3.3.0
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -818,6 +871,7 @@ spec:
           capabilities:
             drop:
             - all
+          readOnlyRootFilesystem: true
           runAsGroup: 999
           runAsNonRoot: true
           runAsUser: 1000
