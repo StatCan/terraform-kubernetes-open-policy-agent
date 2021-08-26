@@ -1,22 +1,3 @@
-# Part of a hack for module-to-module dependencies.
-# https://github.com/hashicorp/terraform/issues/1178#issuecomment-449158607
-# and
-# https://github.com/hashicorp/terraform/issues/1178#issuecomment-473091030
-# Make sure to add this null_resource.dependency_getter to the `depends_on`
-# attribute to all resource(s) that will be constructed first within this
-# module:
-resource "null_resource" "dependency_getter" {
-  triggers = {
-    my_dependencies = join(",", var.dependencies)
-  }
-
-  lifecycle {
-    ignore_changes = [
-      triggers["my_dependencies"],
-    ]
-  }
-}
-
 resource "local_file" "gatekeeper_template" {
   sensitive_content = templatefile("${path.module}/config/gatekeeper.yml", {
     opa_limits_cpu      = var.opa_limits_cpu
@@ -44,10 +25,6 @@ resource "null_resource" "gatekeeper_init" {
   provisioner "local-exec" {
     command = "kubectl -n ${var.kubectl_namespace} apply -f ${local_file.gatekeeper_template.filename}"
   }
-
-  depends_on = [
-    null_resource.dependency_getter,
-  ]
 }
 
 resource "null_resource" "azure_policy_gatekeeper_sync" {
@@ -60,16 +37,11 @@ resource "null_resource" "azure_policy_gatekeeper_sync" {
   provisioner "local-exec" {
     command = "kubectl -n ${var.kubectl_namespace} apply -f ${path.module}/config/azure/gatekeeper-opa-sync.yml"
   }
-
-  depends_on = [
-    null_resource.dependency_getter,
-  ]
 }
 
 resource "helm_release" "azure_policy" {
   count = var.enable_azure_policy ? 1 : 0
 
-  depends_on = ["null_resource.dependency_getter"]
   name       = "azure-policy"
   repository = var.helm_repository
   chart      = "azure-policy-addon-aks-engine"
@@ -81,17 +53,4 @@ resource "helm_release" "azure_policy" {
     var.values,
   ]
 
-}
-
-# Part of a hack for module-to-module dependencies.
-# https://github.com/hashicorp/terraform/issues/1178#issuecomment-449158607
-resource "null_resource" "dependency_setter" {
-  # Part of a hack for module-to-module dependencies.
-  # https://github.com/hashicorp/terraform/issues/1178#issuecomment-449158607
-  # List resource(s) that will be constructed last within the module.
-  depends_on = [
-    null_resource.gatekeeper_init,
-    null_resource.azure_policy_gatekeeper_sync,
-    helm_release.azure_policy
-  ]
 }

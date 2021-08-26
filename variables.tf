@@ -6,10 +6,6 @@ variable "helm_repository" {}
 
 variable "chart_version" {}
 
-variable "dependencies" {
-  type = list(string)
-}
-
 variable "enable_azure_policy" {
   type    = string
   default = "0"
@@ -53,20 +49,20 @@ variable "image_pull_secrets" {
 }
 variable "opa_audit_limits_cpu" {
   default = "1000m"
-  type    = "string"
+  type    = string
 }
 
 variable "opa_audit_limits_memory" {
   default = "512Mi"
-  type    = "string"
+  type    = string
 }
 
 variable "opa_audit_requests_cpu" {
   default = "100m"
-  type    = "string"
+  type    = string
 }
 
 variable "opa_audit_requests_memory" {
   default = "256Mi"
-  type    = "string"
+  type    = string
 }

@@ -12,7 +12,7 @@ The following security controls can be met through configuration of this templat
 
 ## Dependencies
 
-* None
+* Terraform v0.13+
 
 ## Optional (depending on options configured):
 
@@ -22,10 +22,10 @@ The following security controls can be met through configuration of this templat
 
 ```terraform
 module "kubectl_opa" {
-  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v2.0.3"
+  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v3.0.0"
 
-  dependencies = [
-    module.namespace_gatekeeper_system.depended_on,
+  depends_on = [
+    module.namespace_gatekeeper_system,
   ]
 
   kubectl_namespace   = module.namespace_gatekeeper_system.name
@@ -44,7 +44,6 @@ EOF
 
 | Name                      | Type   | Required | Value                                                                         |
 | ------------------------- | ------ | -------- | ----------------------------------------------------------------------------- |
-| dependencies              | list   | yes      | Dependency name refering to namespace module                                  |
 | kubectl_namespace         | list   | yes      | The namespace kubectl will install the manifests under                        |
 | image_hub                 | string | no       | Allows to set the hub from which images will be pulled                        |
 | image_pull_secrets        | list   | no       | The names of the ImagePullSecrets that the ServiceAccount will have access to |
@@ -72,4 +71,5 @@ EOF
 | 20200824 | v2.0.3  | Upgrade OPA to v3.1.0-rc1                                                     |
 | 20200824 | v2.1.0  | Upgrade OPA to v3.2.0, changes to how terraform is configured, update README. |
 | 20201217 | v2.1.1  | Paramaterize OPA Audit limits.                                                |
-| 20200208 | v2.2.0  | Update to Gatekeeper 3.3.0                                                    |
+| 20200208 | v2.2.0  | Update to Gatekeeper v3.3.0                                                   |
+| 20210925 | v3.0.0  | Update module for Terraform v0.13                                             |
