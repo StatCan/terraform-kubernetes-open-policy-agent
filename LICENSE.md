@@ -1,6 +1,7 @@
-MIT License
+## MIT License
 
-Copyright (c) 2019 Government of Canada - Gouvernement du Canada
+Copyright (c) Her Majesty the Queen in Right of Canada, as represented by the
+Minister of Statistics Canada, 2021
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

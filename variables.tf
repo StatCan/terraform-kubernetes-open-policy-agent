@@ -1,14 +1,25 @@
-variable "kubectl_namespace" {}
+variable "namespace" {
+  default = "gatekeeper-system"
+}
 
-variable "helm_namespace" {}
+variable "helm_repository" {
+  default = "https://open-policy-agent.github.io/gatekeeper/charts"
+}
 
-variable "helm_repository" {}
+variable "helm_repository_password" {
+  default = ""
+}
 
-variable "chart_version" {}
+variable "helm_repository_username" {
+  default = ""
+}
 
-variable "enable_azure_policy" {
-  type    = string
-  default = "0"
+variable "chart" {
+  default = "gatekeeper"
+}
+
+variable "chart_version" {
+  default = "3.3.0"
 }
 
 variable "values" {
@@ -37,13 +48,13 @@ variable "opa_requests_memory" {
 }
 
 variable "image_hub" {
-  default     = "openpolicyagent"
+  default     = "docker.io/"
   type        = string
-  description = "The name of the hub from which images will be pulled."
+  description = "The name of the hub from which images will be pulled (with trailing slash)."
 }
 
 variable "image_pull_secrets" {
-  type        = list(string)
+  type        = list(map(any))
   default     = []
   description = "The names of the ImagePullSecrets that the ServiceAccount will have access to."
 }
