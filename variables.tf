@@ -19,7 +19,7 @@ variable "chart" {
 }
 
 variable "chart_version" {
-  default = "3.3.0"
+  default = "3.8.1"
 }
 
 variable "values" {
