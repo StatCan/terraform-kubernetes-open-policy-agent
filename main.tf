@@ -19,6 +19,21 @@ resource "helm_release" "gatekeeper" {
   }
 
   set {
+    name  = "image.crdRepository"
+    value = "${var.image_hub}openpolicyagent/gatekeeper-crds"
+  }
+
+  set {
+    name  = "postInstall.labelNamespace.image.repository"
+    value = "${var.image_hub}openpolicyagent/gatekeeper-crds"
+  }
+
+  set {
+    name  = "preInstall.deleteWebhookConfigurations.image.repository"
+    value = "${var.image_hub}openpolicyagent/gatekeeper-crds"
+  }
+
+  set {
     name  = "controllerManager.resources.limits.cpu"
     value = var.opa_limits_cpu
   }

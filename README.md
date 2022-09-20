@@ -22,7 +22,7 @@ The following security controls can be met through configuration of this templat
 
 ```terraform
 module "helm_gatekeeper" {
-  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v4.1.0"
+  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v4.1.1"
 
   chart_version = "3.8.1"
   depends_on = [
@@ -81,12 +81,13 @@ EOF
 
 | Date     | Release | Change                                                       |
 | -------- | ------- | ------------------------------------------------------------ |
+| 20220920 | v4.1.1  | Ensure jobs get the proper image repository                  |
 | 20220518 | v4.1.0  | Update to Gatekeeper 3.8.1                                   |
 | 20211005 | v4.0.0  | Switch to Helm for GateKeeper installation                   |
 | 20210925 | v3.0.0  | Update module for Terraform v0.13                            |
 | 20200208 | v2.2.0  | Update to Gatekeeper 3.3.0                                   |
 | 20201217 | v2.1.1  | Paramaterize OPA Audit limits.                               |
-| 20200824 | v2.1.0  | Upgrade OPA to v3.2.0, changes to how terraform is configured, update README. |
+| 20200824 | v2.1.0  | Upgrade OPA to v3.2.0, changes to terraform                  |
 | 20200824 | v2.0.3  | Upgrade OPA to v3.1.0-rc1                                    |
 | 20200824 | v2.0.2  | Paramaterize OPA                                             |
 | 20200824 | v2.0.1  | Paramaterize OPA                                             |
