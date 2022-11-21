@@ -75,6 +75,7 @@ resource "helm_release" "gatekeeper" {
 
   values = [
     <<EOF
+replicas: ${var.replicas}
 image:
   pullSecrets: ${jsonencode(var.image_pull_secrets)}
 EOF
