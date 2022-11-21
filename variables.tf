@@ -27,6 +27,11 @@ variable "values" {
   type    = string
 }
 
+variable "replicas" {
+  default = "3"
+  type    = string
+}
+
 variable "opa_limits_cpu" {
   default = "1000m"
   type    = string
