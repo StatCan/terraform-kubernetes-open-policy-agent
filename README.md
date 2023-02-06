@@ -22,7 +22,7 @@ The following security controls can be met through configuration of this templat
 
 ```terraform
 module "helm_gatekeeper" {
-  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v4.1.1"
+  source = "git::https://github.com/canada-ca-terraform-modules/terraform-kubernetes-open-policy-agent.git?ref=v4.2.1"
 
   chart_version = "3.8.1"
   depends_on = [
@@ -81,6 +81,8 @@ EOF
 
 | Date     | Release | Change                                                       |
 | -------- | ------- | ------------------------------------------------------------ |
+| 20230203 | v4.2.1  | Specify sensitive variables                                  |
+| 20221121 | v4.2.0  | Add replicas variable                                        |
 | 20220920 | v4.1.1  | Ensure jobs get the proper image repository                  |
 | 20220518 | v4.1.0  | Update to Gatekeeper 3.8.1                                   |
 | 20211005 | v4.0.0  | Switch to Helm for GateKeeper installation                   |
