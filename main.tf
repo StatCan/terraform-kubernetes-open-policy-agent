@@ -1,3 +1,54 @@
+locals {
+  # The values for gatekeeper that are set by the provider.
+  # Set in a local to take advantage of the IDEs understanding of terraform structure for proper indentation verification.
+  values = {
+    replicas = var.replicas,
+    image = {
+      pullSecrets = var.image_pull_secrets,
+    }
+    postUpgrade = {
+      labelNamespace = {
+        image = {
+          pullSecrets = var.image_pull_secrets
+        }
+      }
+      nodeSelector = var.node_selector
+      tolerations  = var.tolerations
+    }
+    postInstall = {
+      labelNamespace = {
+        image = {
+          pullSecrets = var.image_pull_secrets
+        }
+      }
+      nodeSelector = var.node_selector
+      tolerations  = var.tolerations
+    }
+    preUninstall = {
+      deleteWebhookConfigurations = {
+        image = {
+          pullSecrets = var.image_pull_secrets
+        }
+      }
+      nodeSelector = var.node_selector
+      tolerations  = var.tolerations
+    }
+    controllerManager = {
+      exemptNamespaces = var.exempt_namespaces
+      nodeSelector     = var.node_selector
+      tolerations      = var.tolerations
+    }
+    audit = {
+      nodeSelector = var.node_selector
+      tolerations  = var.tolerations
+    }
+    crds = {
+      nodeSelector = var.node_selector
+      tolerations  = var.tolerations
+    }
+  }
+}
+
 resource "helm_release" "gatekeeper" {
   name                = "gatekeeper"
   namespace           = var.namespace
@@ -14,6 +65,16 @@ resource "helm_release" "gatekeeper" {
   }
 
   set {
+    name  = "auditMatchKindOnly"
+    value = var.audit_match_kind_only
+  }
+
+  set {
+    name  = "logLevel"
+    value = var.log_level
+  }
+
+  set {
     name  = "image.repository"
     value = "${var.image_hub}openpolicyagent/gatekeeper"
   }
@@ -24,12 +85,22 @@ resource "helm_release" "gatekeeper" {
   }
 
   set {
+    name  = "postUpgrade.labelNamespace.image.repository "
+    value = "${var.image_hub}openpolicyagent/gatekeeper-crds"
+  }
+
+  set {
     name  = "postInstall.labelNamespace.image.repository"
     value = "${var.image_hub}openpolicyagent/gatekeeper-crds"
   }
 
   set {
-    name  = "preInstall.deleteWebhookConfigurations.image.repository"
+    name  = "postInstall.probeWebhook.image.repository"
+    value = "${var.image_hub}curlimages/curl"
+  }
+
+  set {
+    name  = "preUninstall.deleteWebhookConfigurations.image.repository"
     value = "${var.image_hub}openpolicyagent/gatekeeper-crds"
   }
 
@@ -73,13 +144,5 @@ resource "helm_release" "gatekeeper" {
     value = var.opa_audit_requests_memory
   }
 
-  values = [
-    <<EOF
-replicas: ${var.replicas}
-image:
-  pullSecrets: ${jsonencode(var.image_pull_secrets)}
-EOF
-    ,
-    var.values
-  ]
+  values = [yamlencode(local.values), var.values]
 }
